@@ -39,6 +39,9 @@ dependencies:
   firebase_core: ^4.1.1
   cloud_firestore: ^6.0.2
   
+  # HTTP client for n8n webhook integration
+  dio: ^5.4.0
+  
   # Freezed for immutable data classes
   freezed_annotation: ^2.4.4
   

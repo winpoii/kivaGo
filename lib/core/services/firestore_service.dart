@@ -87,24 +87,43 @@ class FirestoreService {
   /// ======================
 
   /// Create a new travel plan
-  static Future<void> createTravelPlan(TravelPlanModel travelPlan) async {
+  static Future<String> createTravelPlan(TravelPlanModel travelPlan) async {
     try {
-      print(
-          '🔥 Firestore: Creating travel plan document for ${travelPlan.planId}');
-      final travelPlanJson = travelPlan.toJson();
+      print('🔥 Firestore: Starting createTravelPlan process...');
+
+      // Generate a new document ID if planId is empty
+      final planId = travelPlan.planId.isEmpty
+          ? _firestore.collection(_travelPlansCollection).doc().id
+          : travelPlan.planId;
+
+      print('🔥 Firestore: Generated planId: $planId');
+      print('🔥 Firestore: Collection name: $_travelPlansCollection');
+
+      // Update the travel plan with the generated ID
+      print('🔥 Firestore: Creating copyWith planId...');
+      final travelPlanWithId = travelPlan.copyWith(planId: planId);
+
+      print('🔥 Firestore: Converting to JSON...');
+      final travelPlanJson = travelPlanWithId.toJson();
+
+      print('🔥 Firestore: JSON conversion successful');
       print(
           '🔥 Firestore: Travel plan data keys: ${travelPlanJson.keys.toList()}');
       print(
           '🔥 Firestore: Suggested route type: ${travelPlanJson['suggestedRoute'].runtimeType}');
 
+      print('🔥 Firestore: Writing to Firestore...');
       await _firestore
           .collection(_travelPlansCollection)
-          .doc(travelPlan.planId)
+          .doc(planId)
           .set(travelPlanJson);
 
       print('🔥 Firestore: Travel plan document created successfully');
+      return planId;
     } catch (e) {
       print('🔥 Firestore: Error creating travel plan: $e');
+      print('🔥 Firestore: Error type: ${e.runtimeType}');
+      print('🔥 Firestore: Stack trace: ${StackTrace.current}');
       throw Exception('Failed to create travel plan: $e');
     }
   }

@@ -43,12 +43,12 @@ class AuthService {
 
       // Once signed in, return the UserCredential
       final userCredential = await _auth.signInWithCredential(credential);
-      
+
       // Create or update user in Firestore
       if (userCredential.user != null) {
         await _createOrUpdateUserInFirestore(userCredential.user!);
       }
-      
+
       return userCredential;
     } catch (e) {
       print('Error signing in with Google: $e');
@@ -69,7 +69,6 @@ class AuthService {
     }
   }
 
-
   /// Sign up with email and password
   Future<UserCredential> signUpWithEmailPassword(
     String email,
@@ -80,12 +79,12 @@ class AuthService {
         email: email,
         password: password,
       );
-      
+
       // Create user in Firestore
       if (userCredential.user != null) {
         await _createOrUpdateUserInFirestore(userCredential.user!);
       }
-      
+
       return userCredential;
     } catch (e) {
       print('Error signing up with email/password: $e');
@@ -103,12 +102,12 @@ class AuthService {
         email: email,
         password: password,
       );
-      
+
       // Update user in Firestore (for FCM token, last login, etc.)
       if (userCredential.user != null) {
         await _createOrUpdateUserInFirestore(userCredential.user!);
       }
-      
+
       return userCredential;
     } catch (e) {
       print('Error signing in with email/password: $e');
@@ -121,7 +120,7 @@ class AuthService {
     try {
       // Check if user already exists in Firestore
       final existingUser = await FirestoreService.getUser(firebaseUser.uid);
-      
+
       if (existingUser != null) {
         // Update existing user with latest info
         print('🔄 Updating existing user in Firestore: ${firebaseUser.uid}');
@@ -156,6 +155,7 @@ class AuthService {
         print('🔄 Creating new user in Firestore: ${firebaseUser.uid}');
         await FirestoreService.createUser(newUser);
         print('✅ User created successfully in Firestore');
+        // Note: Travel plans will be created when AI suggests a plan and user accepts it
       }
     } catch (e) {
       print('❌ Error creating/updating user in Firestore: $e');
@@ -168,7 +168,7 @@ class AuthService {
   Future<UserModel?> getCurrentUserFromFirestore() async {
     final firebaseUser = currentUser;
     if (firebaseUser == null) return null;
-    
+
     try {
       return await FirestoreService.getUser(firebaseUser.uid);
     } catch (e) {
@@ -181,7 +181,7 @@ class AuthService {
   Future<void> updateSeekerProfile(SeekerProfileModel profile) async {
     final firebaseUser = currentUser;
     if (firebaseUser == null) throw Exception('User not authenticated');
-    
+
     try {
       await FirestoreService.updateUserProfile(firebaseUser.uid, profile);
     } catch (e) {
@@ -194,7 +194,7 @@ class AuthService {
   Future<void> updateFcmToken(String fcmToken) async {
     final firebaseUser = currentUser;
     if (firebaseUser == null) return;
-    
+
     try {
       final user = await FirestoreService.getUser(firebaseUser.uid);
       if (user != null) {
@@ -221,5 +221,5 @@ class AuthService {
   Future<String> getUserTravelPersonalityDescription() async {
     return await _quizCheckService.getUserTravelPersonalityDescription();
   }
-}
 
+}

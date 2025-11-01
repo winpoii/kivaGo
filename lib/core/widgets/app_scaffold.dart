@@ -33,6 +33,27 @@ class _AppScaffoldState extends State<AppScaffold> {
     });
   }
 
+  // Method to switch to travels page
+  void switchToTravelsPage() {
+    setState(() {
+      _currentIndex = 1; // TravelsPage is at index 1
+    });
+  }
+
+  // Method to switch to profile page
+  void switchToProfilePage() {
+    setState(() {
+      _currentIndex = 2; // ProfilePage is at index 2
+    });
+  }
+
+  // Method to switch to settings page
+  void switchToSettingsPage() {
+    setState(() {
+      _currentIndex = 3; // SettingsPage is at index 3
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
