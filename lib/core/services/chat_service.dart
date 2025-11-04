@@ -14,36 +14,30 @@ class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Send message to AI via n8n webhook
-  /// Returns the planId (either existing or newly created)
+  /// Returns AI response text
   Future<String> sendMessage({
     required String userId,
     required String messageContent,
-    String? planId, // Optional - null for new conversations
   }) async {
     try {
       print('🚀 Sending message to n8n webhook...');
       print('📡 Webhook URL: ${AppConfig.webhookUrl}');
       print('💬 Message: $messageContent');
       print('👤 User ID: $userId');
-      print('📋 Plan ID: ${planId ?? "NEW CONVERSATION"}');
 
-      // Prepare request data based on conversation type
+      // Prepare request body for POST request (no planId)
       final requestData = <String, dynamic>{
         'userId': userId,
         'messageContent': messageContent,
       };
 
-      // Add planId only if it exists (continuing conversation)
-      // If null, n8n will handle creating a new conversation
-      if (planId != null && planId.isNotEmpty) {
-        requestData['planId'] = planId;
-        print('🔄 Continuing existing conversation');
-      } else {
-        print('🆕 Starting new conversation - no planId');
-      }
-
-      print('📤 Request data: $requestData');
+      print('📤 Request body: $requestData');
       print('📋 Headers: ${AppConfig.webhookHeaders}');
+      print('🌐 Webhook URL: ${AppConfig.webhookUrl}');
+      print('📡 Sending POST request to n8n webhook...');
+      print('   - Method: POST');
+      print('   - URL: ${AppConfig.webhookUrl}');
+      print('   - Body: ${requestData.toString()}');
 
       // Send HTTP POST request to n8n webhook
       final response = await _dio.post(
@@ -53,33 +47,89 @@ class ChatService {
           headers: AppConfig.webhookHeaders,
           sendTimeout: Duration(seconds: AppConfig.apiTimeoutSeconds),
           receiveTimeout: Duration(seconds: AppConfig.apiTimeoutSeconds),
+          // Validate status codes - allow 200, 201, 202
+          validateStatus: (status) =>
+              status != null && status >= 200 && status < 300,
         ),
       );
 
       print('✅ n8n webhook response: ${response.statusCode}');
-      print('📥 Response data: ${response.data}');
+      print('📥 Response data (RAW): ${response.data}');
+      print('📥 Response data type: ${response.data.runtimeType}');
 
       if (response.statusCode == 200) {
-        // Extract planId from response
+        // Extract AI response from n8n
         final responseData = response.data;
-        final returnedPlanId = responseData['planId'] as String?;
 
-        if (returnedPlanId != null && returnedPlanId.isNotEmpty) {
-          print('🎉 Message sent successfully! Plan ID: $returnedPlanId');
-          return returnedPlanId;
-        } else {
-          throw Exception('No planId returned from n8n');
+        // Try different possible response formats
+        String aiResponse = '';
+
+        if (responseData is Map) {
+          // Try common n8n response formats
+          if (responseData.containsKey('output')) {
+            aiResponse = responseData['output'].toString();
+            print('📝 Found AI response in "output" field');
+          } else if (responseData.containsKey('aiResponse')) {
+            aiResponse = responseData['aiResponse'].toString();
+            print('📝 Found AI response in "aiResponse" field');
+          } else if (responseData.containsKey('text')) {
+            aiResponse = responseData['text'].toString();
+            print('📝 Found AI response in "text" field');
+          } else if (responseData.containsKey('message')) {
+            aiResponse = responseData['message'].toString();
+            print('📝 Found AI response in "message" field');
+          } else {
+            // If no known field, try to get any text value
+            aiResponse = responseData.values.first.toString();
+            print('⚠️ Using first value as AI response');
+          }
+        } else if (responseData is String) {
+          aiResponse = responseData;
+          print('📝 Response is direct string');
         }
+
+        if (aiResponse.isEmpty) {
+          print('⚠️ AI response is empty! Full response: $responseData');
+          aiResponse = 'AI yanıtı alındı ancak içerik boş.';
+        }
+
+        print('🎉 AI Response extracted: $aiResponse');
+        return aiResponse;
       } else {
         throw Exception('Failed to send message: ${response.statusCode}');
       }
     } on DioException catch (e) {
       print('❌ Dio error: ${e.message}');
+      print('❌ Error type: ${e.type}');
       if (e.response != null) {
-        print('❌ Response data: ${e.response?.data}');
         print('❌ Response status: ${e.response?.statusCode}');
+        print('❌ Response data: ${e.response?.data}');
+        print('❌ Response headers: ${e.response?.headers}');
       }
-      throw Exception('Network error: ${e.message}');
+      print('❌ Request URL: ${e.requestOptions.uri}');
+      print('❌ Request method: ${e.requestOptions.method}');
+      print('❌ Request headers: ${e.requestOptions.headers}');
+
+      // Daha açıklayıcı hata mesajı
+      String errorMessage = 'Network error: ${e.message}';
+
+      if (e.type == DioExceptionType.connectionError) {
+        errorMessage = 'Bağlantı hatası: n8n sunucusuna ulaşılamıyor.\n'
+            'Lütfen kontrol edin:\n'
+            '1. n8n çalışıyor mu? (http://localhost:5678)\n'
+            '2. Android emulator kullanıyorsanız localhost yerine 10.0.2.2 kullanın\n'
+            '3. Webhook aktif mi?\n'
+            '4. Firewall engelliyor mu?';
+      } else if (e.response != null && e.response!.statusCode == 404) {
+        errorMessage = 'Webhook bulunamadı (404).\n'
+            'Lütfen n8n webhook URL\'sinin doğru olduğundan ve webhook\'un aktif olduğundan emin olun.';
+      } else if (e.type == DioExceptionType.connectionTimeout) {
+        errorMessage = 'Bağlantı zaman aşımı. n8n sunucusu yanıt vermiyor.';
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        errorMessage = 'Yanıt zaman aşımı. n8n sunucusu yanıt vermiyor.';
+      }
+
+      throw Exception(errorMessage);
     } catch (e) {
       print('❌ Unexpected error: $e');
       throw Exception('Failed to send message: $e');

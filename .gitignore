@@ -43,3 +43,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment variables (for future use)
+.env
+.env.local
+.env.*.local
+
+# Firebase sensitive files
+google-services.json
+GoogleService-Info.plist
+
+# Local configuration overrides
+lib/core/config/app_config.local.dart

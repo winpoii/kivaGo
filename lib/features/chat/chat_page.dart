@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/chat_service.dart';
 import '../../core/models/user_model.dart';
-import '../../core/models/travel_plan_model.dart';
 
 /// Home page - AI Chat with n8n webhook integration
 class ChatPage extends StatefulWidget {
@@ -19,9 +18,11 @@ class _ChatPageState extends State<ChatPage> {
   final ScrollController _scrollController = ScrollController();
 
   UserModel? _currentUser;
-  String? _currentPlanId;
   bool _isLoading = false;
   bool _isSending = false;
+
+  // Chat messages (in-memory conversation)
+  final List<Map<String, String>> _messages = [];
 
   // Geçmiş sohbetler
   final List<Map<String, String>> _chatHistory = [
@@ -80,29 +81,12 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     try {
-      // Check if user has existing travel plans
-      print('🔍 Checking existing travel plans...');
-      final existingPlans =
-          await _chatService.getUserTravelPlans(_currentUser!.uid);
-      print('📋 Found ${existingPlans.length} existing plans');
+      // DON'T check Firestore - start fresh every time
+      // planId will be generated when user sends first message
+      print('🆕 Starting new chat session');
+      print('   planId will be generated on first message');
 
-      if (existingPlans.isNotEmpty) {
-        // Use the most recent plan
-        print('✅ Using existing plan: ${existingPlans.first.planId}');
-        setState(() {
-          _currentPlanId = existingPlans.first.planId;
-        });
-      } else {
-        // No existing plans - will create new one when first message is sent
-        print(
-            '🆕 No existing plans found. Will create new one on first message.');
-        setState(() {
-          _currentPlanId =
-              null; // Start with null - will be set after first message
-        });
-      }
-
-      print('🎉 Chat initialized successfully. Plan ID: $_currentPlanId');
+      print('🎉 Chat initialized successfully.');
     } catch (e) {
       print('❌ Error initializing chat: $e');
       _showErrorSnackBar('Sohbet başlatılamadı: $e');
@@ -133,34 +117,55 @@ class _ChatPageState extends State<ChatPage> {
 
     try {
       print('🚀 Sending message: $message');
-      print('📋 Current plan ID: $_currentPlanId');
+      print('👤 User ID: ${_currentUser!.uid}');
 
-      // Send message via n8n webhook
-      // If _currentPlanId is null, it will start a new conversation
-      final returnedPlanId = await _chatService.sendMessage(
-        userId: _currentUser!.uid,
-        messageContent: message,
-        planId: _currentPlanId, // Can be null for new conversations
-      );
-
-      // Update currentPlanId if this was a new conversation
-      if (_currentPlanId == null) {
-        print('🆕 New conversation started. Plan ID: $returnedPlanId');
-        setState(() {
-          _currentPlanId = returnedPlanId;
+      // Add user message to chat immediately (optimistic update)
+      setState(() {
+        _messages.add({
+          'role': 'user',
+          'content': message,
+          'timestamp': DateTime.now().toIso8601String(),
         });
-      }
+      });
 
-      // Clear input
+      // Clear input immediately for better UX
       _messageController.clear();
 
       // Scroll to bottom
       _scrollToBottom();
 
-      print('✅ Message sent successfully');
+      // Send message via n8n webhook and get AI response
+      print('📡 Calling n8n webhook...');
+      final aiResponse = await _chatService.sendMessage(
+        userId: _currentUser!.uid,
+        messageContent: message,
+      );
+
+      print('✅ Got AI response: $aiResponse');
+
+      // Add real AI response to chat
+      setState(() {
+        _messages.add({
+          'role': 'assistant',
+          'content': aiResponse,
+          'timestamp': DateTime.now().toIso8601String(),
+        });
+      });
+
+      // Scroll to bottom again to show AI message
+      _scrollToBottom();
+
+      print('✅ Message and AI response added to chat');
     } catch (e) {
       print('❌ Error sending message: $e');
       _showErrorSnackBar('Mesaj gönderilemedi: $e');
+
+      // Remove the user message if sending failed
+      if (_messages.isNotEmpty && _messages.last['role'] == 'user') {
+        setState(() {
+          _messages.removeLast();
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -232,9 +237,8 @@ class _ChatPageState extends State<ChatPage> {
               children: [
                 // Main Chat Area
                 Expanded(
-                  child: _currentPlanId != null
-                      ? _buildChatArea()
-                      : _buildEmptyState(),
+                  child:
+                      _messages.isEmpty ? _buildEmptyState() : _buildChatArea(),
                 ),
 
                 // Message Input
@@ -244,46 +248,21 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  // Build chat area with messages
   Widget _buildChatArea() {
-    return StreamBuilder<TravelPlanModel?>(
-      stream: _chatService.getTravelPlanStream(_currentPlanId!),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(
-            child: Text('Hata: ${snapshot.error}'),
-          );
-        }
-
-        if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(
-              color: Color(0xFFC11336),
-            ),
-          );
-        }
-
-        final travelPlan = snapshot.data!;
-        final messages = travelPlan.aiConversationHistory;
-
-        if (messages.isEmpty) {
-          return _buildEmptyState();
-        }
-
-        return ListView.builder(
-          controller: _scrollController,
-          padding: const EdgeInsets.all(16),
-          itemCount: messages.length,
-          itemBuilder: (context, index) {
-            final message = messages[index];
-            return _buildMessageBubble(message);
-          },
-        );
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.all(16),
+      itemCount: _messages.length,
+      itemBuilder: (context, index) {
+        final message = _messages[index];
+        return _buildMessageBubble(message);
       },
     );
   }
 
-  Widget _buildMessageBubble(AiConversationItemModel message) {
-    final isAI = message.role == 'ai';
+  Widget _buildMessageBubble(Map<String, String> message) {
+    final isAI = message['role'] == 'assistant';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -316,7 +295,7 @@ class _ChatPageState extends State<ChatPage> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
-                message.content,
+                message['content'] ?? '',
                 style: TextStyle(
                   color: isAI ? const Color(0xFF2C2C2C) : Colors.white,
                   fontSize: 16,
