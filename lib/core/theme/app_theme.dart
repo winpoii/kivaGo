@@ -35,7 +35,7 @@ class AppTheme {
     ),
 
     // Card theme with rounded corners and soft shadows
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       color: Colors.white,
@@ -101,7 +101,7 @@ class AppTheme {
     ),
 
     // Card theme with rounded corners and soft shadows
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: const Color(0xFF2A2A2A),

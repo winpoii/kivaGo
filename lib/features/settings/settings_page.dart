@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/services/auth_service.dart';
 import '../auth/signup_page.dart';
+import 'account_detail.dart';
 
 /// Settings page
 class SettingsPage extends StatefulWidget {
@@ -119,7 +120,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 icon: Icons.person_outline,
                 title: 'Hesap Detayları',
                 subtitle: 'Hesap bilgilerinizi yönetin',
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AccountDetailPage(),
+                    ),
+                  );
+                },
               ),
 
               const SizedBox(height: 12),

@@ -3,6 +3,7 @@ import '../../core/services/auth_service.dart';
 import '../../core/services/firestore_service.dart';
 import '../../core/models/user_model.dart';
 import '../quiz/quiz_intro_page.dart';
+import '../settings/account_detail.dart';
 
 /// Profile page
 class ProfilePage extends StatefulWidget {
@@ -305,7 +306,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       width: double.infinity,
                       height: 50,
                       child: OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const AccountDetailPage(),
+                            ),
+                          );
+                        },
                         style: OutlinedButton.styleFrom(
                           backgroundColor: const Color(0xFFFCF3F6),
                           side: BorderSide.none,

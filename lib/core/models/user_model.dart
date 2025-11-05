@@ -16,6 +16,11 @@ class UserModel with _$UserModel {
     @TimestampConverter() required DateTime createdAt,
     required String fcmToken,
     required SeekerProfileModel seekerProfile,
+    @Default('') String username,
+    @Default('') String country,
+    @Default('') String city,
+    @Default('') String firstName,
+    @Default('') String lastName,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

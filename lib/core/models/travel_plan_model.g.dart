@@ -42,8 +42,8 @@ Map<String, dynamic> _$$TravelPlanModelImplToJson(
       'updatedAt': const TimestampConverter().toJson(instance.updatedAt),
       'experienceManifesto': instance.experienceManifesto,
       'moodKeywords': instance.moodKeywords,
-      'suggestedRoute': instance.suggestedRoute.map((e) => e.toJson()).toList(),
-      'aiConversationHistory': instance.aiConversationHistory.map((e) => e.toJson()).toList(),
+      'suggestedRoute': instance.suggestedRoute,
+      'aiConversationHistory': instance.aiConversationHistory,
     };
 
 _$SuggestedRouteItemModelImpl _$$SuggestedRouteItemModelImplFromJson(

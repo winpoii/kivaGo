@@ -42,6 +42,9 @@ dependencies:
   # HTTP client for n8n webhook integration
   dio: ^5.4.0
   
+  # Country picker for selecting countries
+  country_picker: ^2.0.27
+  
   # Freezed for immutable data classes
   freezed_annotation: ^2.4.4
   

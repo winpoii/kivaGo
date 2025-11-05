@@ -28,6 +28,11 @@ mixin _$UserModel {
   DateTime get createdAt => throw _privateConstructorUsedError;
   String get fcmToken => throw _privateConstructorUsedError;
   SeekerProfileModel get seekerProfile => throw _privateConstructorUsedError;
+  String get username => throw _privateConstructorUsedError;
+  String get country => throw _privateConstructorUsedError;
+  String get city => throw _privateConstructorUsedError;
+  String get firstName => throw _privateConstructorUsedError;
+  String get lastName => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,7 +56,12 @@ abstract class $UserModelCopyWith<$Res> {
       String photoUrl,
       @TimestampConverter() DateTime createdAt,
       String fcmToken,
-      SeekerProfileModel seekerProfile});
+      SeekerProfileModel seekerProfile,
+      String username,
+      String country,
+      String city,
+      String firstName,
+      String lastName});
 
   $SeekerProfileModelCopyWith<$Res> get seekerProfile;
 }
@@ -78,6 +88,11 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? createdAt = null,
     Object? fcmToken = null,
     Object? seekerProfile = null,
+    Object? username = null,
+    Object? country = null,
+    Object? city = null,
+    Object? firstName = null,
+    Object? lastName = null,
   }) {
     return _then(_value.copyWith(
       uid: null == uid
@@ -108,6 +123,26 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.seekerProfile
           : seekerProfile // ignore: cast_nullable_to_non_nullable
               as SeekerProfileModel,
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
+      country: null == country
+          ? _value.country
+          : country // ignore: cast_nullable_to_non_nullable
+              as String,
+      city: null == city
+          ? _value.city
+          : city // ignore: cast_nullable_to_non_nullable
+              as String,
+      firstName: null == firstName
+          ? _value.firstName
+          : firstName // ignore: cast_nullable_to_non_nullable
+              as String,
+      lastName: null == lastName
+          ? _value.lastName
+          : lastName // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 
@@ -137,7 +172,12 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String photoUrl,
       @TimestampConverter() DateTime createdAt,
       String fcmToken,
-      SeekerProfileModel seekerProfile});
+      SeekerProfileModel seekerProfile,
+      String username,
+      String country,
+      String city,
+      String firstName,
+      String lastName});
 
   @override
   $SeekerProfileModelCopyWith<$Res> get seekerProfile;
@@ -163,6 +203,11 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? fcmToken = null,
     Object? seekerProfile = null,
+    Object? username = null,
+    Object? country = null,
+    Object? city = null,
+    Object? firstName = null,
+    Object? lastName = null,
   }) {
     return _then(_$UserModelImpl(
       uid: null == uid
@@ -193,6 +238,26 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.seekerProfile
           : seekerProfile // ignore: cast_nullable_to_non_nullable
               as SeekerProfileModel,
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
+      country: null == country
+          ? _value.country
+          : country // ignore: cast_nullable_to_non_nullable
+              as String,
+      city: null == city
+          ? _value.city
+          : city // ignore: cast_nullable_to_non_nullable
+              as String,
+      firstName: null == firstName
+          ? _value.firstName
+          : firstName // ignore: cast_nullable_to_non_nullable
+              as String,
+      lastName: null == lastName
+          ? _value.lastName
+          : lastName // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -207,7 +272,12 @@ class _$UserModelImpl implements _UserModel {
       required this.photoUrl,
       @TimestampConverter() required this.createdAt,
       required this.fcmToken,
-      required this.seekerProfile});
+      required this.seekerProfile,
+      this.username = '',
+      this.country = '',
+      this.city = '',
+      this.firstName = '',
+      this.lastName = ''});
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
@@ -227,10 +297,25 @@ class _$UserModelImpl implements _UserModel {
   final String fcmToken;
   @override
   final SeekerProfileModel seekerProfile;
+  @override
+  @JsonKey()
+  final String username;
+  @override
+  @JsonKey()
+  final String country;
+  @override
+  @JsonKey()
+  final String city;
+  @override
+  @JsonKey()
+  final String firstName;
+  @override
+  @JsonKey()
+  final String lastName;
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, createdAt: $createdAt, fcmToken: $fcmToken, seekerProfile: $seekerProfile)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, createdAt: $createdAt, fcmToken: $fcmToken, seekerProfile: $seekerProfile, username: $username, country: $country, city: $city, firstName: $firstName, lastName: $lastName)';
   }
 
   @override
@@ -249,13 +334,33 @@ class _$UserModelImpl implements _UserModel {
             (identical(other.fcmToken, fcmToken) ||
                 other.fcmToken == fcmToken) &&
             (identical(other.seekerProfile, seekerProfile) ||
-                other.seekerProfile == seekerProfile));
+                other.seekerProfile == seekerProfile) &&
+            (identical(other.username, username) ||
+                other.username == username) &&
+            (identical(other.country, country) || other.country == country) &&
+            (identical(other.city, city) || other.city == city) &&
+            (identical(other.firstName, firstName) ||
+                other.firstName == firstName) &&
+            (identical(other.lastName, lastName) ||
+                other.lastName == lastName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, uid, email, displayName,
-      photoUrl, createdAt, fcmToken, seekerProfile);
+  int get hashCode => Object.hash(
+      runtimeType,
+      uid,
+      email,
+      displayName,
+      photoUrl,
+      createdAt,
+      fcmToken,
+      seekerProfile,
+      username,
+      country,
+      city,
+      firstName,
+      lastName);
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -281,7 +386,12 @@ abstract class _UserModel implements UserModel {
       required final String photoUrl,
       @TimestampConverter() required final DateTime createdAt,
       required final String fcmToken,
-      required final SeekerProfileModel seekerProfile}) = _$UserModelImpl;
+      required final SeekerProfileModel seekerProfile,
+      final String username,
+      final String country,
+      final String city,
+      final String firstName,
+      final String lastName}) = _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
       _$UserModelImpl.fromJson;
@@ -301,6 +411,16 @@ abstract class _UserModel implements UserModel {
   String get fcmToken;
   @override
   SeekerProfileModel get seekerProfile;
+  @override
+  String get username;
+  @override
+  String get country;
+  @override
+  String get city;
+  @override
+  String get firstName;
+  @override
+  String get lastName;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

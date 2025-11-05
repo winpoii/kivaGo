@@ -13,6 +13,8 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -23,10 +25,32 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  String? _validateFirstName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'İsim gerekli';
+    }
+    if (value.trim().isEmpty) {
+      return 'İsim boş olamaz';
+    }
+    return null;
+  }
+
+  String? _validateLastName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Soyisim gerekli';
+    }
+    if (value.trim().isEmpty) {
+      return 'Soyisim boş olamaz';
+    }
+    return null;
   }
 
   String? _validateEmail(String? value) {
@@ -68,19 +92,30 @@ class _SignUpPageState extends State<SignUpPage> {
       await _authService.signUpWithEmailPassword(
         _emailController.text.trim(),
         _passwordController.text,
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
       );
       if (mounted) {
         await _navigateAfterAuth(context);
       }
     } catch (e) {
       if (mounted) {
-        String errorMessage = 'Sign up failed';
-        if (e.toString().contains('email-already-in-use')) {
-          errorMessage = 'Email is already registered';
-        } else if (e.toString().contains('weak-password')) {
-          errorMessage = 'Password is too weak';
-        } else if (e.toString().contains('invalid-email')) {
-          errorMessage = 'Invalid email address';
+        String errorMessage = 'Kayıt başarısız oldu';
+        final errorString = e.toString().toLowerCase();
+        
+        if (errorString.contains('email-already-in-use')) {
+          errorMessage = 'Bu email zaten kayıtlı';
+        } else if (errorString.contains('weak-password')) {
+          errorMessage = 'Şifre çok zayıf';
+        } else if (errorString.contains('invalid-email')) {
+          errorMessage = 'Geçersiz email adresi';
+        } else if (errorString.contains('failed to create user') || 
+                   errorString.contains('firestore')) {
+          errorMessage = 'Kullanıcı kaydı oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.';
+          print('Firestore error during signup: $e');
+        } else {
+          // Show the actual error message for debugging, but in a user-friendly way
+          errorMessage = 'Bir hata oluştu: ${e.toString()}';
         }
         
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,6 +126,7 @@ class _SignUpPageState extends State<SignUpPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -179,6 +215,68 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
 
               const SizedBox(height: 40),
+
+              // First Name field
+              TextFormField(
+                controller: _firstNameController,
+                validator: _validateFirstName,
+                textInputAction: TextInputAction.next,
+                decoration: const InputDecoration(
+                  hintText: 'İsim',
+                  hintStyle: TextStyle(color: Color(0xFF999999), fontSize: 16),
+                  filled: true,
+                  fillColor: Color(0xFFFDF5F7),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    borderSide: BorderSide(color: Color(0xFFC11336), width: 2),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Last Name field
+              TextFormField(
+                controller: _lastNameController,
+                validator: _validateLastName,
+                textInputAction: TextInputAction.next,
+                decoration: const InputDecoration(
+                  hintText: 'Soyisim',
+                  hintStyle: TextStyle(color: Color(0xFF999999), fontSize: 16),
+                  filled: true,
+                  fillColor: Color(0xFFFDF5F7),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    borderSide: BorderSide(color: Color(0xFFC11336), width: 2),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
 
               // Email field
               TextFormField(

@@ -19,19 +19,43 @@ class FirestoreService {
   static Future<void> createUser(UserModel user) async {
     try {
       print('🔥 Firestore: Creating user document for ${user.uid}');
+      
+      // Manually serialize nested models for Firestore compatibility
       final userJson = user.toJson();
+      
+      // Calculate scores'i manuel olarak Map'e çeviriyoruz
+      final calculatedScoresJson = <String, dynamic>{
+        'adventure': user.seekerProfile.calculatedScores.adventure,
+        'serenity': user.seekerProfile.calculatedScores.serenity,
+        'culture': user.seekerProfile.calculatedScores.culture,
+        'social': user.seekerProfile.calculatedScores.social,
+      };
+      
+      // SeekerProfile'i manuel olarak oluşturuyoruz
+      final seekerProfileJson = <String, dynamic>{
+        'title': user.seekerProfile.title,
+        'description': user.seekerProfile.description,
+        'testAnswers': user.seekerProfile.testAnswers,
+        'calculatedScores': calculatedScoresJson,
+      };
+      
+      // User JSON'a seekerProfile'i ekliyoruz
+      userJson['seekerProfile'] = seekerProfileJson;
+      
       print('🔥 Firestore: User data keys: ${userJson.keys.toList()}');
-      print(
-          '🔥 Firestore: SeekerProfile type: ${userJson['seekerProfile'].runtimeType}');
+      print('🔥 Firestore: SeekerProfile is Map: ${userJson['seekerProfile'] is Map}');
+      print('🔥 Firestore: CalculatedScores is Map: ${seekerProfileJson['calculatedScores'] is Map}');
 
       await _firestore
           .collection(_usersCollection)
           .doc(user.uid)
-          .set(user.toJson());
+          .set(userJson);
 
       print('🔥 Firestore: User document created successfully');
     } catch (e) {
       print('🔥 Firestore: Error creating user: $e');
+      print('🔥 Firestore: Error type: ${e.runtimeType}');
+      print('🔥 Firestore: Stack trace: ${StackTrace.current}');
       throw Exception('Failed to create user: $e');
     }
   }
@@ -53,12 +77,47 @@ class FirestoreService {
   /// Update user document
   static Future<void> updateUser(String uid, UserModel user) async {
     try {
+      // Manually serialize nested models for Firestore compatibility
+      final userJson = user.toJson();
+      
+      // Calculate scores'i manuel olarak Map'e çeviriyoruz
+      final calculatedScoresJson = <String, dynamic>{
+        'adventure': user.seekerProfile.calculatedScores.adventure,
+        'serenity': user.seekerProfile.calculatedScores.serenity,
+        'culture': user.seekerProfile.calculatedScores.culture,
+        'social': user.seekerProfile.calculatedScores.social,
+      };
+      
+      // SeekerProfile'i manuel olarak oluşturuyoruz
+      final seekerProfileJson = <String, dynamic>{
+        'title': user.seekerProfile.title,
+        'description': user.seekerProfile.description,
+        'testAnswers': user.seekerProfile.testAnswers,
+        'calculatedScores': calculatedScoresJson,
+      };
+      
+      // User JSON'a seekerProfile'i ekliyoruz
+      userJson['seekerProfile'] = seekerProfileJson;
+      
       await _firestore
           .collection(_usersCollection)
           .doc(uid)
-          .set(user.toJson(), SetOptions(merge: true));
+          .set(userJson, SetOptions(merge: true));
     } catch (e) {
+      print('🔥 Firestore: Error updating user: $e');
       throw Exception('Failed to update user: $e');
+    }
+  }
+
+  /// Update specific user fields (doesn't touch nested objects like seekerProfile)
+  static Future<void> updateUserFields(String uid, Map<String, dynamic> fields) async {
+    try {
+      await _firestore
+          .collection(_usersCollection)
+          .doc(uid)
+          .update(fields);
+    } catch (e) {
+      throw Exception('Failed to update user fields: $e');
     }
   }
 
@@ -66,10 +125,39 @@ class FirestoreService {
   static Future<void> updateUserProfile(
       String uid, SeekerProfileModel profile) async {
     try {
+      print('🔥 Firestore: Updating seeker profile for user: $uid');
+      print('🔥 Firestore: Profile calculatedScores type: ${profile.calculatedScores.runtimeType}');
+      
+      // Manually serialize nested models for Firestore compatibility
+      // Build the profile JSON manually to ensure all nested models are serialized
+      // Calculate scores'i manuel olarak Map'e çeviriyoruz
+      final calculatedScoresJson = <String, dynamic>{
+        'adventure': profile.calculatedScores.adventure,
+        'serenity': profile.calculatedScores.serenity,
+        'culture': profile.calculatedScores.culture,
+        'social': profile.calculatedScores.social,
+      };
+      
+      final profileJson = <String, dynamic>{
+        'title': profile.title,
+        'description': profile.description,
+        'testAnswers': profile.testAnswers,
+        'calculatedScores': calculatedScoresJson, // Manuel olarak oluşturulmuş Map
+      };
+      
+      print('🔥 Firestore: Profile keys: ${profileJson.keys.toList()}');
+      print('🔥 Firestore: CalculatedScores is Map: ${profileJson['calculatedScores'] is Map}');
+      print('🔥 Firestore: CalculatedScores values: ${calculatedScoresJson}');
+      
       await _firestore.collection(_usersCollection).doc(uid).update({
-        'seekerProfile': profile.toJson(),
+        'seekerProfile': profileJson,
       });
+      
+      print('🔥 Firestore: Seeker profile updated successfully');
     } catch (e) {
+      print('🔥 Firestore: Error updating seeker profile: $e');
+      print('🔥 Firestore: Error type: ${e.runtimeType}');
+      print('🔥 Firestore: Stack trace: ${StackTrace.current}');
       throw Exception('Failed to update user profile: $e');
     }
   }

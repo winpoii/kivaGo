@@ -17,6 +17,11 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       fcmToken: json['fcmToken'] as String,
       seekerProfile: SeekerProfileModel.fromJson(
           json['seekerProfile'] as Map<String, dynamic>),
+      username: json['username'] as String? ?? '',
+      country: json['country'] as String? ?? '',
+      city: json['city'] as String? ?? '',
+      firstName: json['firstName'] as String? ?? '',
+      lastName: json['lastName'] as String? ?? '',
     );
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
@@ -27,7 +32,12 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'photoUrl': instance.photoUrl,
       'createdAt': const TimestampConverter().toJson(instance.createdAt),
       'fcmToken': instance.fcmToken,
-      'seekerProfile': instance.seekerProfile.toJson(),
+      'seekerProfile': instance.seekerProfile,
+      'username': instance.username,
+      'country': instance.country,
+      'city': instance.city,
+      'firstName': instance.firstName,
+      'lastName': instance.lastName,
     };
 
 _$SeekerProfileModelImpl _$$SeekerProfileModelImplFromJson(
@@ -48,7 +58,7 @@ Map<String, dynamic> _$$SeekerProfileModelImplToJson(
       'title': instance.title,
       'description': instance.description,
       'testAnswers': instance.testAnswers,
-      'calculatedScores': instance.calculatedScores.toJson(),
+      'calculatedScores': instance.calculatedScores,
     };
 
 _$CalculatedScoresModelImpl _$$CalculatedScoresModelImplFromJson(
