@@ -47,6 +47,7 @@ dependencies:
   
   # JSON serialization
   json_annotation: ^4.9.0
+  getwidget: ^7.0.0
 
 dev_dependencies:
   flutter_test:
