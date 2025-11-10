@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../core/models/travel_profile.dart';
 import '../../core/widgets/app_scaffold.dart';
 
@@ -435,11 +436,10 @@ class _QuizResultPageState extends State<QuizResultPage>
                         height: 60,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => AppScaffold(key: appScaffoldKey),
-                              ),
-                              (route) => false,
+                            Get.offAll(
+                              () => const AppScaffold(),
+                              transition: Transition.fadeIn,
+                              duration: const Duration(milliseconds: 300),
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -476,11 +476,10 @@ class _QuizResultPageState extends State<QuizResultPage>
                       height: 52,
                       child: OutlinedButton(
                         onPressed: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (context) => AppScaffold(key: appScaffoldKey),
-                            ),
-                            (route) => false,
+                          Get.offAll(
+                            () => const AppScaffold(),
+                            transition: Transition.fadeIn,
+                            duration: const Duration(milliseconds: 300),
                           );
                         },
                         style: OutlinedButton.styleFrom(

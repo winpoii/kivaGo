@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:get/get.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'features/splash/splash_screen.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'kivaGo AI',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
