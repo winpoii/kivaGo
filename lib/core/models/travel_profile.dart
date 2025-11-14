@@ -68,6 +68,25 @@ extension TravelProfileTypeExtension on TravelProfileType {
     }
   }
 
+  String get imageUrl {
+    switch (this) {
+      case TravelProfileType.adventureSeeker:
+        return 'https://images.unsplash.com/photo-1718472507745-ff60974a7cba?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+      case TravelProfileType.relaxedTraveler:
+        return 'https://plus.unsplash.com/premium_photo-1684917944838-30fe85aa6059?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+      case TravelProfileType.explorer:
+        return 'https://plus.unsplash.com/premium_photo-1661337053802-320722486314?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+      case TravelProfileType.luxuryTraveler:
+        return 'https://plus.unsplash.com/premium_photo-1664302528539-ea19c3a75fe3?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+      case TravelProfileType.natureLover:
+        return 'https://images.unsplash.com/photo-1654127654058-20748de1f7e5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+      case TravelProfileType.socialTraveler:
+        return 'https://plus.unsplash.com/premium_photo-1723478475281-95075826aeb0?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+      case TravelProfileType.budgetBackpacker:
+        return 'https://images.unsplash.com/photo-1623497717224-9ccb164e7666?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+    }
+  }
+
   List<String> get traits {
     switch (this) {
       case TravelProfileType.adventureSeeker:

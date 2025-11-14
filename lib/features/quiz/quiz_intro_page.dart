@@ -304,20 +304,17 @@ class _IntroHeaderImage extends StatelessWidget {
                 24,
                 28,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'KiviGo’yla kişisel seyahat kimliğini oluştur',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.92),
-                      fontSize: isSmallScreen ? 13 : 14,
-                      height: 1.35,
-                      letterSpacing: -0.1,
-                    ),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Text(
+                  'KivaGo',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.92),
+                    fontSize: isSmallScreen ? 13 : 14,
+                    height: 1.35,
+                    letterSpacing: -0.1,
                   ),
-                ],
+                ),
               ),
             ),
           ],
